@@ -74,7 +74,7 @@ void SerialServer::serial_read() {
     int len;
     while ((len = this->available()) > 0) {
         char buf[128];
-        size_t read = this->readBytes(buf, min(len, 128));
+        size_t read = this->read_byte(buf, min(len, 128));
         for (auto const& client : this->clients_)
             client->tcp_client->write(buf, read);
     }
