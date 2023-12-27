@@ -45,6 +45,27 @@ status_led:
     number: GPIO13
     inverted: true
 
+switch:
+  - platform: restart
+    name: "Restart the Gateway"
+  - platform: gpio
+    pin: GPIO04
+    id: zRSTrelay
+    inverted: yes
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 10ms
+      - switch.turn_off: zRSTrelay
+  - platform: gpio
+    pin: GPIO05
+    name: "EFR32 Bootloader mode (for flashing only, disables normal operation)"
+    inverted: yes
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - switch.turn_on: zRSTrelay
+    on_turn_off:
+      - switch.turn_on: zRSTrelay
+
 output:
   # the 3 lines below control the Green LED
   - platform: esp8266_pwm
