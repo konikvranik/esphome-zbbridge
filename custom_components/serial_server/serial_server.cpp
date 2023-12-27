@@ -22,6 +22,7 @@
 
 #include "esphome/core/log.h"
 #include "esphome/core/util.h"
+#include "esphome/components/network/util.h"
 
 static const char *TAG = "serial_server";
 
@@ -74,9 +75,9 @@ void SerialServer::serial_read() {
     int len;
     while ((len = this->available()) > 0) {
         char buf[128];
-        size_t read = this->read_array(buf, min(len, 128));
+        size_t read = this->read_array(reinterpret_cast<uint8_t*>(buf), min(len, 128));
         for (auto const& client : this->clients_)
-            client->tcp_client->write((char *)buf, read);
+            client->tcp_client->write(buf, read);
     }
 }
 
@@ -90,7 +91,9 @@ void SerialServer::serial_write() {
 
 void SerialServer::dump_config() {
     ESP_LOGCONFIG(TAG, "Serial Server:");
-    ESP_LOGCONFIG(TAG, "  Address: %s:%u", network_get_address().c_str(), this->port_);
+    ESP_LOGCONFIG(TAG, "  Address: %s:%u",
+    esphome::network::get_ip_address().str().c_str(),
+    this->port_);
 }
 
 void SerialServer::on_shutdown() {
